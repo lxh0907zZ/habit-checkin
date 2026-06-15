@@ -2,213 +2,171 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>习惯打卡</title>
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html { font-size: 16px; }
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
   background: #f5f5f5;
   color: #1a1a1a;
   min-height: 100dvh;
   display: flex;
   justify-content: center;
-  padding: 32px 16px 120px;
+  padding: 24px 12px 120px;
 }
 
-.app {
-  width: 100%;
-  max-width: 420px;
+.app { width: 100%; max-width: 420px; }
+
+.header { text-align: center; margin-bottom: 20px; }
+.header h1 { font-size: 1.4rem; font-weight: 700; }
+.header .date { font-size: 0.8rem; color: #888; margin-top: 2px; }
+
+.progress-section { margin-bottom: 20px; }
+.progress-bar-outer { background: #e0e0e0; border-radius: 6px; height: 8px; overflow: hidden; }
+.progress-bar-inner { background: #4caf50; height: 100%; width: 0%; border-radius: 6px; transition: width 0.35s ease; }
+.progress-text { text-align: center; font-size: 0.85rem; color: #666; margin-top: 6px; }
+
+.countdown-section {
+  background: #fff; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+}
+.countdown-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+}
+.countdown-header .label {
+  font-size: 0.85rem; font-weight: 600; color: #333; white-space: nowrap;
+}
+.countdown-header input[type="date"] {
+  border: 1px solid #ddd; border-radius: 6px; padding: 4px 8px;
+  font-size: 0.8rem; outline: none; flex: 1; max-width: 160px;
+}
+.countdown-header input[type="date"]:focus { border-color: #4caf50; }
+.countdown-header .clear-cd {
+  border: none; background: transparent; color: #ccc; font-size: 1rem; cursor: pointer; padding: 2px 4px;
+}
+.countdown-header .clear-cd:hover { color: #e53935; }
+.countdown-display {
+  text-align: center; margin-top: 8px; font-size: 1.3rem; font-weight: 700;
+  color: #e53935; letter-spacing: 0.04em;
+}
+.countdown-display .unit { font-size: 0.75rem; font-weight: 400; color: #888; margin: 0 2px 0 1px; }
+.countdown-display .sep { color: #ccc; margin: 0 4px; }
+.countdown-empty {
+  text-align: center; font-size: 0.8rem; color: #bbb; margin-top: 8px;
 }
 
-.header {
-  text-align: center;
-  margin-bottom: 28px;
+.calendar-section {
+  background: #fff; border-radius: 10px; padding: 12px 12px 8px; margin-bottom: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.07);
 }
-.header h1 {
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+.calendar-nav {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
 }
-.header .date {
-  font-size: 0.85rem;
-  color: #888;
-  margin-top: 4px;
+.calendar-nav .month-label { font-size: 0.9rem; font-weight: 600; color: #333; }
+.calendar-nav button {
+  border: none; background: transparent; font-size: 1.1rem; cursor: pointer;
+  color: #888; padding: 4px 8px; border-radius: 6px;
 }
-
-.progress-bar-outer {
-  background: #e0e0e0;
-  border-radius: 6px;
-  height: 8px;
-  margin-bottom: 8px;
-  overflow: hidden;
+.calendar-nav button:hover { color: #333; background: #f0f0f0; }
+.calendar-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px;
 }
-.progress-bar-inner {
-  background: #4caf50;
-  height: 100%;
-  width: 0%;
-  border-radius: 6px;
-  transition: width 0.35s ease;
+.calendar-grid .weekday {
+  text-align: center; font-size: 0.7rem; color: #999; padding: 4px 0; font-weight: 500;
 }
-.progress-text {
-  text-align: center;
-  font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 24px;
+.calendar-grid .day {
+  text-align: center; font-size: 0.8rem; color: #333; padding: 5px 0;
+  border-radius: 50%; position: relative; cursor: default;
+  width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
 }
+.calendar-grid .day.other-month { color: #ddd; }
+.calendar-grid .day.today { font-weight: 700; color: #4caf50; }
+.calendar-grid .day.has-checkin {
+  color: #fff; background: #4caf50; font-weight: 600;
+}
+.calendar-grid .day.today.has-checkin { background: #388e3c; }
 
 .empty-state {
-  text-align: center;
-  padding: 48px 16px;
-  color: #aaa;
-  display: none;
+  text-align: center; padding: 40px 16px; color: #aaa; display: none;
 }
 .empty-state.visible { display: block; }
-.empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
-.empty-state .text { font-size: 0.95rem; }
+.empty-state .icon { font-size: 2.2rem; margin-bottom: 10px; }
+.empty-state .text { font-size: 0.9rem; }
 
-.habit-list {
-  display: none;
-  flex-direction: column;
-  gap: 0;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-}
+.habit-list { display: none; flex-direction: column; gap: 0; border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.07); }
 .habit-list.visible { display: flex; }
 
 .habit-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 16px;
-  background: #fff;
-  border-bottom: 1px solid #f0f0f0;
-  cursor: pointer;
-  user-select: none;
-  -webkit-tap-highlight-color: transparent;
-  transition: background 0.15s;
+  display: flex; align-items: center; gap: 10px; padding: 12px 14px;
+  background: #fff; border-bottom: 1px solid #f0f0f0; cursor: pointer;
+  user-select: none; -webkit-tap-highlight-color: transparent; transition: background 0.15s;
 }
 .habit-item:hover { background: #fafafa; }
 .habit-item:last-child { border-bottom: none; }
 
 .check-circle {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  border: 2px solid #d0d0d0;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 22px; height: 22px; border-radius: 50%; border: 2px solid #d0d0d0;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
   transition: border-color 0.2s, background 0.2s;
 }
-.habit-item.done .check-circle {
-  border-color: #4caf50;
-  background: #4caf50;
-}
+.habit-item.done .check-circle { border-color: #4caf50; background: #4caf50; }
 .check-circle::after {
-  content: "";
-  display: block;
-  width: 6px;
-  height: 11px;
-  border: solid #fff;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg) scale(0);
-  margin-top: -2px;
-  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  content: ""; display: block; width: 5px; height: 10px;
+  border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg) scale(0);
+  margin-top: -2px; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.habit-item.done .check-circle::after {
-  transform: rotate(45deg) scale(1);
-}
+.habit-item.done .check-circle::after { transform: rotate(45deg) scale(1); }
 
-.habit-name {
-  flex: 1;
-  font-size: 1rem;
-  transition: color 0.2s, text-decoration 0.2s;
+.habit-name { flex: 1; font-size: 0.95rem; transition: color 0.2s, text-decoration 0.2s; }
+.habit-item.done .habit-name { color: #aaa; text-decoration: line-through; }
+
+.habit-count {
+  font-size: 0.8rem; color: #999; white-space: nowrap; flex-shrink: 0;
 }
-.habit-item.done .habit-name {
-  color: #aaa;
-  text-decoration: line-through;
-}
+.habit-item.done .habit-count { color: #aaa; }
 
 .delete-btn {
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: transparent;
-  color: #ccc;
-  font-size: 1.1rem;
-  cursor: pointer;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  opacity: 0;
+  width: 26px; height: 26px; border: none; background: transparent; color: #ccc;
+  font-size: 1rem; cursor: pointer; border-radius: 6px; display: flex;
+  align-items: center; justify-content: center; flex-shrink: 0; opacity: 0;
   transition: opacity 0.15s, color 0.15s, background 0.15s;
 }
 .habit-item:hover .delete-btn { opacity: 1; }
 .delete-btn:hover { color: #e53935; background: #fce4e4; }
 
-.add-bar {
-  display: flex;
-  gap: 8px;
-  margin-top: 24px;
-}
+.add-bar { display: flex; gap: 8px; margin-top: 16px; }
 .add-input {
-  flex: 1;
-  height: 44px;
-  padding: 0 14px;
-  border: 1.5px solid #ddd;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.2s;
+  flex: 1; height: 44px; padding: 0 14px; border: 1.5px solid #ddd;
+  border-radius: 10px; font-size: 0.95rem; outline: none; transition: border-color 0.2s;
 }
 .add-input:focus { border-color: #4caf50; }
 .add-input::placeholder { color: #bbb; }
 .add-btn {
-  height: 44px;
-  width: 44px;
-  border: none;
-  border-radius: 10px;
-  background: #4caf50;
-  color: #fff;
-  font-size: 1.3rem;
-  cursor: pointer;
-  flex-shrink: 0;
+  height: 44px; width: 44px; border: none; border-radius: 10px;
+  background: #4caf50; color: #fff; font-size: 1.3rem; cursor: pointer; flex-shrink: 0;
   transition: background 0.15s;
 }
 .add-btn:hover { background: #43a047; }
 .add-btn:active { background: #388e3c; }
 
 .toast {
-  position: fixed;
-  bottom: 32px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: #333;
-  color: #fff;
-  padding: 10px 20px;
-  border-radius: 8px;
-  font-size: 0.85rem;
-  opacity: 0;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  pointer-events: none;
-  z-index: 100;
+  position: fixed; bottom: 32px; left: 50%;
+  transform: translateX(-50%) translateY(80px); background: #333; color: #fff;
+  padding: 10px 20px; border-radius: 8px; font-size: 0.85rem; opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease; pointer-events: none; z-index: 100;
 }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
 @media (max-width: 480px) {
-  body { padding: 20px 12px 100px; }
-  .header h1 { font-size: 1.3rem; }
-  .habit-item { padding: 14px 12px; }
+  body { padding: 16px 10px 100px; }
+  .habit-item { padding: 12px 10px; }
   .delete-btn { opacity: 1; }
   .add-input, .add-btn { height: 48px; }
   .add-btn { width: 48px; font-size: 1.4rem; }
+  .calendar-grid .day { font-size: 0.75rem; }
 }
 </style>
 </head>
@@ -219,10 +177,44 @@ body {
     <div class="date" id="dateLabel"></div>
   </div>
 
-  <div class="progress-bar-outer">
-    <div class="progress-bar-inner" id="progressBar"></div>
+  <div class="progress-section">
+    <div class="progress-bar-outer">
+      <div class="progress-bar-inner" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">今日完成 0 / 0</div>
   </div>
-  <div class="progress-text" id="progressText">今日完成 0 / 0</div>
+
+  <div class="countdown-section" id="countdownSection">
+    <div class="countdown-header">
+      <span class="label">比赛倒计时</span>
+      <input type="date" id="cdDateInput" />
+      <button class="clear-cd" id="cdClearBtn" title="清除">&#x2716;</button>
+    </div>
+    <div class="countdown-display" id="cdDisplay" style="display:none;">
+      <span id="cdDays">0</span><span class="unit">天</span><span class="sep">|</span>
+      <span id="cdHours">0</span><span class="unit">小时</span><span class="sep">|</span>
+      <span id="cdMins">0</span><span class="unit">分</span><span class="sep">|</span>
+      <span id="cdSecs">0</span><span class="unit">秒</span>
+    </div>
+    <div class="countdown-empty" id="cdEmpty">设置目标日期，开始倒计时</div>
+  </div>
+
+  <div class="calendar-section">
+    <div class="calendar-nav">
+      <button id="calPrev">&#x2039;</button>
+      <span class="month-label" id="calMonthLabel"></span>
+      <button id="calNext">&#x203A;</button>
+    </div>
+    <div class="calendar-grid" id="calGrid">
+      <div class="weekday">一</div>
+      <div class="weekday">二</div>
+      <div class="weekday">三</div>
+      <div class="weekday">四</div>
+      <div class="weekday">五</div>
+      <div class="weekday">六</div>
+      <div class="weekday">日</div>
+    </div>
+  </div>
 
   <div class="empty-state" id="emptyState">
     <div class="icon">&#x1F4CB;</div>
@@ -232,14 +224,7 @@ body {
   <div class="habit-list" id="habitList"></div>
 
   <div class="add-bar">
-    <input
-      class="add-input"
-      id="addInput"
-      type="text"
-      placeholder="添加新习惯…"
-      maxlength="20"
-      autocomplete="off"
-    />
+    <input class="add-input" id="addInput" type="text" placeholder="添加新习惯…" maxlength="20" autocomplete="off" />
     <button class="add-btn" id="addBtn" aria-label="添加">+</button>
   </div>
 </div>
@@ -252,6 +237,7 @@ body {
 
   var STORAGE_HABITS = 'habit-tracker-habits';
   var STORAGE_COMPLETIONS = 'habit-tracker-completions';
+  var STORAGE_COUNTDOWN = 'habit-tracker-countdown';
 
   function todayKey() {
     var d = new Date();
@@ -261,27 +247,27 @@ body {
   }
 
   function formatDate(key) {
-    var parts = key.split('-');
-    return parts[0] + '\u5E74' + parseInt(parts[1]) + '\u6708' + parseInt(parts[2]) + '\u65E5';
+    var p = key.split('-');
+    return p[0] + '年' + parseInt(p[1]) + '月' + parseInt(p[2]) + '日';
   }
 
-  function loadHabits() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_HABITS)) || []; }
-    catch (e) { return []; }
+  function parseLocalDate(str) {
+    var p = str.split('-');
+    return new Date(parseInt(p[0]), parseInt(p[1]) - 1, parseInt(p[2]));
   }
 
-  function saveHabits(habits) {
-    localStorage.setItem(STORAGE_HABITS, JSON.stringify(habits));
+  function toLocalDateStr(d) {
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
   }
 
-  function loadCompletions() {
-    try { return JSON.parse(localStorage.getItem(STORAGE_COMPLETIONS)) || {}; }
-    catch (e) { return {}; }
-  }
-
-  function saveCompletions(comps) {
-    localStorage.setItem(STORAGE_COMPLETIONS, JSON.stringify(comps));
-  }
+  function loadHabits() { try { return JSON.parse(localStorage.getItem(STORAGE_HABITS)) || []; } catch(e) { return []; } }
+  function saveHabits(h) { localStorage.setItem(STORAGE_HABITS, JSON.stringify(h)); }
+  function loadCompletions() { try { return JSON.parse(localStorage.getItem(STORAGE_COMPLETIONS)) || {}; } catch(e) { return {}; } }
+  function saveCompletions(c) { localStorage.setItem(STORAGE_COMPLETIONS, JSON.stringify(c)); }
+  function loadCountdown() { try { return localStorage.getItem(STORAGE_COUNTDOWN) || ''; } catch(e) { return ''; } }
+  function saveCountdown(v) { localStorage.setItem(STORAGE_COUNTDOWN, v); }
 
   var habits = loadHabits();
   var completions = loadCompletions();
@@ -292,6 +278,10 @@ body {
     saveCompletions(completions);
   }
 
+  var calYear = new Date().getFullYear();
+  var calMonth = new Date().getMonth();
+  var cdTimer = null;
+
   var dateLabel = document.getElementById('dateLabel');
   var progressBar = document.getElementById('progressBar');
   var progressText = document.getElementById('progressText');
@@ -300,6 +290,18 @@ body {
   var addInput = document.getElementById('addInput');
   var addBtn = document.getElementById('addBtn');
   var toast = document.getElementById('toast');
+  var calGrid = document.getElementById('calGrid');
+  var calMonthLabel = document.getElementById('calMonthLabel');
+  var calPrev = document.getElementById('calPrev');
+  var calNext = document.getElementById('calNext');
+  var cdDateInput = document.getElementById('cdDateInput');
+  var cdDisplay = document.getElementById('cdDisplay');
+  var cdEmpty = document.getElementById('cdEmpty');
+  var cdDays = document.getElementById('cdDays');
+  var cdHours = document.getElementById('cdHours');
+  var cdMins = document.getElementById('cdMins');
+  var cdSecs = document.getElementById('cdSecs');
+  var cdClearBtn = document.getElementById('cdClearBtn');
 
   var toastTimer = null;
   function showToast(msg) {
@@ -308,6 +310,130 @@ body {
     clearTimeout(toastTimer);
     toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 1800);
   }
+
+  function getCumulativeCount(habitId) {
+    var count = 0;
+    Object.keys(completions).forEach(function(date) {
+      if (completions[date][habitId]) count++;
+    });
+    return count;
+  }
+
+  function hasCheckinOnDate(dateStr) {
+    var dayComps = completions[dateStr];
+    if (!dayComps) return false;
+    return Object.keys(dayComps).length > 0;
+  }
+
+  function renderCalendar() {
+    calMonthLabel.textContent = calYear + '年' + (calMonth + 1) + '月';
+    while (calGrid.children.length > 7) calGrid.removeChild(calGrid.lastChild);
+
+    var firstDay = new Date(calYear, calMonth, 1).getDay();
+    var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    var daysInPrev = new Date(calYear, calMonth, 0).getDate();
+    var first = firstDay === 0 ? 6 : firstDay - 1;
+
+    var now = new Date();
+    var todayDateStr = toLocalDateStr(now);
+
+    for (var i = first - 1; i >= 0; i--) {
+      var el = document.createElement('div');
+      el.className = 'day other-month';
+      el.textContent = daysInPrev - i;
+      calGrid.appendChild(el);
+    }
+    for (var d = 1; d <= daysInMonth; d++) {
+      var dateStr = calYear + '-' + String(calMonth + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+      var el = document.createElement('div');
+      var cls = 'day';
+      if (dateStr === todayDateStr) cls += ' today';
+      if (hasCheckinOnDate(dateStr)) cls += ' has-checkin';
+      el.className = cls;
+      el.textContent = d;
+      calGrid.appendChild(el);
+    }
+    var totalCells = calGrid.children.length;
+    var remainder = totalCells % 7;
+    if (remainder !== 0) {
+      var extra = 7 - remainder;
+      for (var i = 1; i <= extra; i++) {
+        var el = document.createElement('div');
+        el.className = 'day other-month';
+        el.textContent = i;
+        calGrid.appendChild(el);
+      }
+    }
+  }
+
+  calPrev.addEventListener('click', function() {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalendar();
+  });
+  calNext.addEventListener('click', function() {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalendar();
+  });
+
+  function initCountdown() {
+    var saved = loadCountdown();
+    if (saved) cdDateInput.value = saved;
+    updateCountdown();
+  }
+
+  function updateCountdown() {
+    var val = cdDateInput.value;
+    saveCountdown(val);
+    if (!val) {
+      cdDisplay.style.display = 'none';
+      cdEmpty.style.display = 'block';
+      clearInterval(cdTimer);
+      cdTimer = null;
+      return;
+    }
+    cdEmpty.style.display = 'none';
+    cdDisplay.style.display = 'block';
+    clearInterval(cdTimer);
+    tickCountdown(val);
+    cdTimer = setInterval(function() { tickCountdown(val); }, 1000);
+  }
+
+  function tickCountdown(val) {
+    var target = parseLocalDate(val);
+    target.setHours(23, 59, 59, 999);
+    var now = new Date();
+    var diff = target.getTime() - now.getTime();
+    if (diff <= 0) {
+      cdDays.textContent = '0';
+      cdHours.textContent = '0';
+      cdMins.textContent = '0';
+      cdSecs.textContent = '0';
+      clearInterval(cdTimer);
+      return;
+    }
+    var totalSecs = Math.floor(diff / 1000);
+    var days = Math.floor(totalSecs / 86400);
+    totalSecs %= 86400;
+    var hours = Math.floor(totalSecs / 3600);
+    totalSecs %= 3600;
+    var mins = Math.floor(totalSecs / 60);
+    var secs = totalSecs % 60;
+    cdDays.textContent = days;
+    cdHours.textContent = hours;
+    cdMins.textContent = mins;
+    cdSecs.textContent = secs;
+  }
+
+  cdDateInput.addEventListener('change', updateCountdown);
+  cdClearBtn.addEventListener('click', function() {
+    cdDateInput.value = '';
+    saveCountdown('');
+    clearInterval(cdTimer); cdTimer = null;
+    cdDisplay.style.display = 'none';
+    cdEmpty.style.display = 'block';
+  });
 
   function render() {
     dateLabel.textContent = formatDate(today);
@@ -323,7 +449,7 @@ body {
     habitList.innerHTML = '';
     habits.forEach(function(h) {
       var done = !!completions[today][h.id];
-
+      var cum = getCumulativeCount(h.id);
       var item = document.createElement('div');
       item.className = 'habit-item' + (done ? ' done' : '');
       item.dataset.id = h.id;
@@ -335,6 +461,10 @@ body {
       nameEl.className = 'habit-name';
       nameEl.textContent = h.name;
 
+      var countEl = document.createElement('span');
+      countEl.className = 'habit-count';
+      countEl.textContent = '累计 ' + cum + '次';
+
       var delBtn = document.createElement('button');
       delBtn.className = 'delete-btn';
       delBtn.textContent = '\u00D7';
@@ -342,11 +472,13 @@ body {
 
       item.appendChild(circle);
       item.appendChild(nameEl);
+      item.appendChild(countEl);
       item.appendChild(delBtn);
       habitList.appendChild(item);
     });
 
     updateProgress();
+    renderCalendar();
   }
 
   function updateProgress() {
@@ -355,9 +487,7 @@ body {
     habits.forEach(function(h) {
       if (completions[today][h.id]) done++;
     });
-
     progressText.textContent = '今日完成 ' + done + ' / ' + total;
-
     var pct = total === 0 ? 0 : Math.round((done / total) * 100);
     progressBar.style.width = pct + '%';
   }
@@ -400,27 +530,15 @@ body {
     var item = e.target.closest('.habit-item');
     if (!item) return;
     var id = item.dataset.id;
-
-    if (e.target.closest('.delete-btn')) {
-      e.stopPropagation();
-      deleteHabit(id);
-      return;
-    }
-
+    if (e.target.closest('.delete-btn')) { e.stopPropagation(); deleteHabit(id); return; }
     toggleHabit(id);
   });
 
-  addBtn.addEventListener('click', function() {
-    addHabit(addInput.value.trim());
-  });
-
-  addInput.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') {
-      addHabit(addInput.value.trim());
-    }
-  });
+  addBtn.addEventListener('click', function() { addHabit(addInput.value.trim()); });
+  addInput.addEventListener('keydown', function(e) { if (e.key === 'Enter') addHabit(addInput.value.trim()); });
 
   render();
+  initCountdown();
   addInput.focus();
 })();
 </script>
