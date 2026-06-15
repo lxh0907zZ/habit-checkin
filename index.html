@@ -1,0 +1,428 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>习惯打卡</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: #f5f5f5;
+  color: #1a1a1a;
+  min-height: 100dvh;
+  display: flex;
+  justify-content: center;
+  padding: 32px 16px 120px;
+}
+
+.app {
+  width: 100%;
+  max-width: 420px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+.header .date {
+  font-size: 0.85rem;
+  color: #888;
+  margin-top: 4px;
+}
+
+.progress-bar-outer {
+  background: #e0e0e0;
+  border-radius: 6px;
+  height: 8px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.progress-bar-inner {
+  background: #4caf50;
+  height: 100%;
+  width: 0%;
+  border-radius: 6px;
+  transition: width 0.35s ease;
+}
+.progress-text {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 16px;
+  color: #aaa;
+  display: none;
+}
+.empty-state.visible { display: block; }
+.empty-state .icon { font-size: 2.5rem; margin-bottom: 12px; }
+.empty-state .text { font-size: 0.95rem; }
+
+.habit-list {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.habit-list.visible { display: flex; }
+
+.habit-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s;
+}
+.habit-item:hover { background: #fafafa; }
+.habit-item:last-child { border-bottom: none; }
+
+.check-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: 2px solid #d0d0d0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+.habit-item.done .check-circle {
+  border-color: #4caf50;
+  background: #4caf50;
+}
+.check-circle::after {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 11px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) scale(0);
+  margin-top: -2px;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.habit-item.done .check-circle::after {
+  transform: rotate(45deg) scale(1);
+}
+
+.habit-name {
+  flex: 1;
+  font-size: 1rem;
+  transition: color 0.2s, text-decoration 0.2s;
+}
+.habit-item.done .habit-name {
+  color: #aaa;
+  text-decoration: line-through;
+}
+
+.delete-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  color: #ccc;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
+}
+.habit-item:hover .delete-btn { opacity: 1; }
+.delete-btn:hover { color: #e53935; background: #fce4e4; }
+
+.add-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 24px;
+}
+.add-input {
+  flex: 1;
+  height: 44px;
+  padding: 0 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.add-input:focus { border-color: #4caf50; }
+.add-input::placeholder { color: #bbb; }
+.add-btn {
+  height: 44px;
+  width: 44px;
+  border: none;
+  border-radius: 10px;
+  background: #4caf50;
+  color: #fff;
+  font-size: 1.3rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+.add-btn:hover { background: #43a047; }
+.add-btn:active { background: #388e3c; }
+
+.toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  opacity: 0;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  pointer-events: none;
+  z-index: 100;
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+@media (max-width: 480px) {
+  body { padding: 20px 12px 100px; }
+  .header h1 { font-size: 1.3rem; }
+  .habit-item { padding: 14px 12px; }
+  .delete-btn { opacity: 1; }
+  .add-input, .add-btn { height: 48px; }
+  .add-btn { width: 48px; font-size: 1.4rem; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="header">
+    <h1>习惯打卡</h1>
+    <div class="date" id="dateLabel"></div>
+  </div>
+
+  <div class="progress-bar-outer">
+    <div class="progress-bar-inner" id="progressBar"></div>
+  </div>
+  <div class="progress-text" id="progressText">今日完成 0 / 0</div>
+
+  <div class="empty-state" id="emptyState">
+    <div class="icon">&#x1F4CB;</div>
+    <div class="text">还没有习惯，添加一个吧</div>
+  </div>
+
+  <div class="habit-list" id="habitList"></div>
+
+  <div class="add-bar">
+    <input
+      class="add-input"
+      id="addInput"
+      type="text"
+      placeholder="添加新习惯…"
+      maxlength="20"
+      autocomplete="off"
+    />
+    <button class="add-btn" id="addBtn" aria-label="添加">+</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function() {
+  'use strict';
+
+  var STORAGE_HABITS = 'habit-tracker-habits';
+  var STORAGE_COMPLETIONS = 'habit-tracker-completions';
+
+  function todayKey() {
+    var d = new Date();
+    return d.getFullYear() + '-' +
+      String(d.getMonth() + 1).padStart(2, '0') + '-' +
+      String(d.getDate()).padStart(2, '0');
+  }
+
+  function formatDate(key) {
+    var parts = key.split('-');
+    return parts[0] + '\u5E74' + parseInt(parts[1]) + '\u6708' + parseInt(parts[2]) + '\u65E5';
+  }
+
+  function loadHabits() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_HABITS)) || []; }
+    catch (e) { return []; }
+  }
+
+  function saveHabits(habits) {
+    localStorage.setItem(STORAGE_HABITS, JSON.stringify(habits));
+  }
+
+  function loadCompletions() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_COMPLETIONS)) || {}; }
+    catch (e) { return {}; }
+  }
+
+  function saveCompletions(comps) {
+    localStorage.setItem(STORAGE_COMPLETIONS, JSON.stringify(comps));
+  }
+
+  var habits = loadHabits();
+  var completions = loadCompletions();
+  var today = todayKey();
+
+  if (!completions[today]) {
+    completions[today] = {};
+    saveCompletions(completions);
+  }
+
+  var dateLabel = document.getElementById('dateLabel');
+  var progressBar = document.getElementById('progressBar');
+  var progressText = document.getElementById('progressText');
+  var emptyState = document.getElementById('emptyState');
+  var habitList = document.getElementById('habitList');
+  var addInput = document.getElementById('addInput');
+  var addBtn = document.getElementById('addBtn');
+  var toast = document.getElementById('toast');
+
+  var toastTimer = null;
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function() { toast.classList.remove('show'); }, 1800);
+  }
+
+  function render() {
+    dateLabel.textContent = formatDate(today);
+
+    if (habits.length === 0) {
+      emptyState.classList.add('visible');
+      habitList.classList.remove('visible');
+    } else {
+      emptyState.classList.remove('visible');
+      habitList.classList.add('visible');
+    }
+
+    habitList.innerHTML = '';
+    habits.forEach(function(h) {
+      var done = !!completions[today][h.id];
+
+      var item = document.createElement('div');
+      item.className = 'habit-item' + (done ? ' done' : '');
+      item.dataset.id = h.id;
+
+      var circle = document.createElement('div');
+      circle.className = 'check-circle';
+
+      var nameEl = document.createElement('span');
+      nameEl.className = 'habit-name';
+      nameEl.textContent = h.name;
+
+      var delBtn = document.createElement('button');
+      delBtn.className = 'delete-btn';
+      delBtn.textContent = '\u00D7';
+      delBtn.setAttribute('aria-label', '删除 ' + h.name);
+
+      item.appendChild(circle);
+      item.appendChild(nameEl);
+      item.appendChild(delBtn);
+      habitList.appendChild(item);
+    });
+
+    updateProgress();
+  }
+
+  function updateProgress() {
+    var total = habits.length;
+    var done = 0;
+    habits.forEach(function(h) {
+      if (completions[today][h.id]) done++;
+    });
+
+    progressText.textContent = '今日完成 ' + done + ' / ' + total;
+
+    var pct = total === 0 ? 0 : Math.round((done / total) * 100);
+    progressBar.style.width = pct + '%';
+  }
+
+  function toggleHabit(id) {
+    if (completions[today][id]) {
+      delete completions[today][id];
+    } else {
+      completions[today][id] = true;
+    }
+    saveCompletions(completions);
+    render();
+  }
+
+  function addHabit(name) {
+    if (!name) return;
+    habits.push({
+      id: 'h_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+      name: name,
+      createdAt: today
+    });
+    saveHabits(habits);
+    render();
+    addInput.value = '';
+    addInput.focus();
+  }
+
+  function deleteHabit(id) {
+    habits = habits.filter(function(h) { return h.id !== id; });
+    saveHabits(habits);
+    Object.keys(completions).forEach(function(date) {
+      delete completions[date][id];
+    });
+    saveCompletions(completions);
+    render();
+    showToast('已删除');
+  }
+
+  habitList.addEventListener('click', function(e) {
+    var item = e.target.closest('.habit-item');
+    if (!item) return;
+    var id = item.dataset.id;
+
+    if (e.target.closest('.delete-btn')) {
+      e.stopPropagation();
+      deleteHabit(id);
+      return;
+    }
+
+    toggleHabit(id);
+  });
+
+  addBtn.addEventListener('click', function() {
+    addHabit(addInput.value.trim());
+  });
+
+  addInput.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      addHabit(addInput.value.trim());
+    }
+  });
+
+  render();
+  addInput.focus();
+})();
+</script>
+</body>
+</html>
