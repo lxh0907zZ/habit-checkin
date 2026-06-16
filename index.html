@@ -29,7 +29,7 @@ body {
 .progress-bar-inner { background: #4caf50; height: 100%; width: 0%; border-radius: 6px; transition: width 0.35s ease; }
 .progress-text { text-align: center; font-size: 0.85rem; color: #666; margin-top: 6px; }
 
-.countdown-section {
+.cd-section {
   background: #fff; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.07);
 }
@@ -43,21 +43,13 @@ body {
 }
 .cd-add-btn:hover { background: #43a047; }
 .cd-add-btn:active { background: #388e3c; }
-
-.cd-item {
-  background: #fafafa; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
-  position: relative;
-}
+.cd-item { background: #fafafa; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px; }
 .cd-item:last-of-type { margin-bottom: 0; }
-
-.cd-item-header {
-  display: flex; align-items: center; gap: 6px; margin-bottom: 6px;
-}
+.cd-item-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
 .cd-item-header .cd-name {
   flex: 1; font-size: 0.85rem; font-weight: 500; color: #333;
   border: none; background: transparent; outline: none; padding: 2px 4px;
-  border-bottom: 1.5px solid transparent; transition: border-color 0.2s;
-  min-width: 0;
+  border-bottom: 1.5px solid transparent; transition: border-color 0.2s; min-width: 0;
 }
 .cd-item-header .cd-name:focus { border-bottom-color: #4caf50; }
 .cd-item-header .cd-name::placeholder { color: #bbb; font-weight: 400; }
@@ -66,29 +58,20 @@ body {
   cursor: pointer; padding: 0 2px; flex-shrink: 0;
 }
 .cd-item-header .cd-del:hover { color: #e53935; }
-
-.cd-item-row {
-  display: flex; align-items: center; gap: 8px;
-}
+.cd-item-row { display: flex; align-items: center; gap: 8px; }
 .cd-item-row input[type="date"] {
   border: 1px solid #ddd; border-radius: 6px; padding: 4px 8px;
   font-size: 0.78rem; outline: none; flex: 1; max-width: 150px;
 }
 .cd-item-row input[type="date"]:focus { border-color: #4caf50; }
-
 .cd-item-display {
   font-size: 1.1rem; font-weight: 700; color: #e53935;
   letter-spacing: 0.03em; white-space: nowrap;
 }
 .cd-item-display .u { font-size: 0.7rem; font-weight: 400; color: #888; margin: 0 1px 0 0; }
 .cd-item-display .s { color: #ccc; margin: 0 3px; }
-.cd-item-empty {
-  font-size: 0.78rem; color: #bbb; white-space: nowrap;
-}
-
-.cd-empty-state {
-  text-align: center; font-size: 0.8rem; color: #bbb; padding: 4px 0;
-}
+.cd-item-empty { font-size: 0.78rem; color: #bbb; white-space: nowrap; }
+.cd-empty-state { text-align: center; font-size: 0.8rem; color: #bbb; padding: 4px 0; }
 
 .calendar-section {
   background: #fff; border-radius: 10px; padding: 12px 12px 8px; margin-bottom: 16px;
@@ -111,17 +94,15 @@ body {
 }
 .calendar-grid .day {
   text-align: center; font-size: 0.8rem; color: #333; padding: 5px 0;
-  border-radius: 50%; position: relative; cursor: default;
-  width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; cursor: default; width: 100%; aspect-ratio: 1;
+  display: flex; align-items: center; justify-content: center;
 }
 .calendar-grid .day.other-month { color: #ddd; }
 .calendar-grid .day.today { font-weight: 700; color: #4caf50; }
 .calendar-grid .day.has-checkin { color: #fff; background: #4caf50; font-weight: 600; }
 .calendar-grid .day.today.has-checkin { background: #388e3c; }
 
-.empty-state {
-  text-align: center; padding: 40px 16px; color: #aaa; display: none;
-}
+.empty-state { text-align: center; padding: 40px 16px; color: #aaa; display: none; }
 .empty-state.visible { display: block; }
 .empty-state .icon { font-size: 2.2rem; margin-bottom: 10px; }
 .empty-state .text { font-size: 0.9rem; }
@@ -136,7 +117,6 @@ body {
 }
 .habit-item:hover { background: #fafafa; }
 .habit-item:last-child { border-bottom: none; }
-
 .check-circle {
   width: 22px; height: 22px; border-radius: 50%; border: 2px solid #d0d0d0;
   flex-shrink: 0; display: flex; align-items: center; justify-content: center;
@@ -149,13 +129,10 @@ body {
   margin-top: -2px; transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 .habit-item.done .check-circle::after { transform: rotate(45deg) scale(1); }
-
 .habit-name { flex: 1; font-size: 0.95rem; transition: color 0.2s, text-decoration 0.2s; }
 .habit-item.done .habit-name { color: #aaa; text-decoration: line-through; }
-
 .habit-count { font-size: 0.8rem; color: #999; white-space: nowrap; flex-shrink: 0; }
 .habit-item.done .habit-count { color: #aaa; }
-
 .delete-btn {
   width: 26px; height: 26px; border: none; background: transparent; color: #ccc;
   font-size: 1rem; cursor: pointer; border-radius: 6px; display: flex;
@@ -188,6 +165,50 @@ body {
 }
 .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
+/* Calendar Detail Overlay */
+.overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.35); z-index: 200;
+  display: none; align-items: flex-end; justify-content: center;
+}
+.overlay.show { display: flex; }
+.overlay-panel {
+  background: #fff; width: 100%; max-width: 420px; max-height: 70vh;
+  border-radius: 16px 16px 0 0; padding: 20px 20px 32px; overflow-y: auto;
+  animation: slideUp 0.25s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.overlay-panel .o-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+}
+.overlay-panel .o-header .o-title { font-size: 1rem; font-weight: 600; color: #333; }
+.overlay-panel .o-header .o-close {
+  border: none; background: transparent; font-size: 1.3rem; color: #999; cursor: pointer; padding: 4px;
+}
+.overlay-panel .o-header .o-close:hover { color: #333; }
+.o-habit-item {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  border-bottom: 1px solid #f5f5f5;
+}
+.o-habit-item:last-child { border-bottom: none; }
+.o-habit-item .o-circle {
+  width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d0d0d0;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+}
+.o-habit-item .o-circle.done { border-color: #4caf50; background: #4caf50; }
+.o-habit-item .o-circle.done::after {
+  content: ""; display: block; width: 5px; height: 9px;
+  border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); margin-top: -2px;
+}
+.o-habit-item .o-name { flex: 1; font-size: 0.9rem; color: #333; }
+.o-habit-item .o-name.done { color: #aaa; text-decoration: line-through; }
+.o-habit-item .o-checked { font-size: 0.8rem; color: #4caf50; }
+.o-habit-item .o-unchecked { font-size: 0.8rem; color: #ccc; }
+.o-empty-msg { text-align: center; color: #bbb; font-size: 0.9rem; padding: 20px 0; }
+
 @media (max-width: 480px) {
   body { padding: 16px 10px 100px; }
   .habit-item { padding: 12px 10px; }
@@ -212,7 +233,7 @@ body {
     <div class="progress-text" id="progressText">今日完成 0 / 0</div>
   </div>
 
-  <div class="countdown-section" id="cdSection">
+  <div class="cd-section" id="cdSection">
     <div class="cd-section-header">
       <span class="label">比赛倒计时</span>
       <button class="cd-add-btn" id="cdAddBtn">+ 添加</button>
@@ -248,6 +269,16 @@ body {
   <div class="add-bar">
     <input class="add-input" id="addInput" type="text" placeholder="添加新习惯…" maxlength="20" autocomplete="off" />
     <button class="add-btn" id="addBtn" aria-label="添加">+</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="overlay-panel">
+    <div class="o-header">
+      <span class="o-title" id="oTitle">打卡详情</span>
+      <button class="o-close" id="oClose">&#x2716;</button>
+    </div>
+    <div id="oBody"></div>
   </div>
 </div>
 
@@ -320,6 +351,10 @@ body {
   var cdList = document.getElementById('cdList');
   var cdEmpty = document.getElementById('cdEmpty');
   var cdAddBtn = document.getElementById('cdAddBtn');
+  var overlay = document.getElementById('overlay');
+  var oTitle = document.getElementById('oTitle');
+  var oBody = document.getElementById('oBody');
+  var oClose = document.getElementById('oClose');
 
   var toastTimer = null;
   function showToast(msg) {
@@ -344,6 +379,55 @@ body {
     if (!dayComps) return false;
     return Object.keys(dayComps).length > 0;
   }
+
+  function showDayDetail(dateStr) {
+    oTitle.textContent = formatDate(dateStr) + ' 打卡详情';
+    oBody.innerHTML = '';
+
+    if (habits.length === 0) {
+      oBody.innerHTML = '<div class="o-empty-msg">还没有习惯</div>';
+      overlay.classList.add('show');
+      return;
+    }
+
+    var dayComps = completions[dateStr] || {};
+    var doneCount = 0;
+
+    habits.forEach(function(h) {
+      var done = !!dayComps[h.id];
+      if (done) doneCount++;
+
+      var item = document.createElement('div');
+      item.className = 'o-habit-item';
+
+      var circle = document.createElement('div');
+      circle.className = 'o-circle' + (done ? ' done' : '');
+
+      var name = document.createElement('span');
+      name.className = 'o-name' + (done ? ' done' : '');
+      name.textContent = h.name;
+
+      var status = document.createElement('span');
+      status.className = done ? 'o-checked' : 'o-unchecked';
+      status.textContent = done ? '已打卡' : '未打卡';
+
+      item.appendChild(circle);
+      item.appendChild(name);
+      item.appendChild(status);
+      oBody.appendChild(item);
+    });
+
+    overlay.classList.add('show');
+  }
+
+  function closeOverlay() {
+    overlay.classList.remove('show');
+  }
+
+  overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeOverlay();
+  });
+  oClose.addEventListener('click', closeOverlay);
 
   function renderCalendar() {
     calMonthLabel.textContent = calYear + '年' + (calMonth + 1) + '月';
@@ -370,6 +454,10 @@ body {
       if (hasCheckinOnDate(dateStr)) cls += ' has-checkin';
       el.className = cls;
       el.textContent = d;
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', (function(ds) {
+        return function() { showDayDetail(ds); };
+      })(dateStr));
       calGrid.appendChild(el);
     }
     var totalCells = calGrid.children.length;
@@ -526,12 +614,10 @@ body {
     cds.push({ id: genId(), name: '', targetDate: '' });
     saveCDs(cds);
     renderCDs();
-    // Focus the name input of the new item
     var items = cdList.querySelectorAll('.cd-name');
     if (items.length > 0) items[items.length - 1].focus();
   });
 
-  // ── Render ──
   function render() {
     dateLabel.textContent = formatDate(today);
 
@@ -553,7 +639,6 @@ body {
 
       var circle = document.createElement('div');
       circle.className = 'check-circle';
-
       var nameEl = document.createElement('span');
       nameEl.className = 'habit-name';
       nameEl.textContent = h.name;
